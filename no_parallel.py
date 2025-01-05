@@ -3,6 +3,7 @@ import random
 import seaborn as sns
 import matplotlib.pyplot as plt
 import time
+import psutil
 
 def initialize_grid(grid_size, heat_source):
     grid = np.zeros((grid_size, grid_size), dtype=float)
@@ -32,20 +33,36 @@ def main():
 
     grid = initialize_grid(grid_size, heat_source)
 
-    # Measure execution time
+    # Measure execution time and memory usage
     start_time = time.time()
+    process = psutil.Process()
+    initial_memory = process.memory_info().rss / 1024 ** 2
 
     # Perform Monte Carlo heat transfer simulation
     grid = random_walk_transfer(grid, steps)
 
     end_time = time.time()
+    final_memory = process.memory_info().rss / 1024 ** 2
     execution_time = end_time - start_time
+    memory_usage = final_memory - initial_memory
+
     print(f"Execution Time: {execution_time:.2f} seconds")
+    print(f"Memory Usage: {memory_usage:.2f} MB")
 
     # Visualize the final grid using seaborn
-    sns.heatmap(grid, cmap='coolwarm', cbar_kws={'label': 'Temperature'})
+    sns.heatmap(grid, cmap='rocket', cbar_kws={'label': 'Temperature'})
     plt.title('Heat Distribution')
     plt.show()
+
+    with open('no_parallel.txt', 'w') as file:
+        messages = [
+            f"execution time = {execution_time:.2f} seconds",
+            f"memory usage = {memory_usage:.2f} MB",
+            f"grid size = {grid_size}",
+            f"number of steps for computation = {steps}",
+        ]
+
+        file.writelines("% s\n" % data for data in messages)
 
 if __name__ == "__main__":
     main()

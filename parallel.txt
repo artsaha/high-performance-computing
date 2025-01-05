@@ -1,0 +1,4 @@
+execution time = 10.15 seconds
+memory usage = 0.63 MB
+grid size = 200
+number of steps for computation = 400
